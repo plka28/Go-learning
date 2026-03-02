@@ -13,5 +13,5 @@ func dialogue() float64 {
 	return Return
 }
 func calculate(num, origVal, targetVal float64) float64 {
-
+	return num
 }
