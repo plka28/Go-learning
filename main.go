@@ -2,8 +2,11 @@ package main
 
 import "fmt"
 
+type stringMap = map[string]string
+
 func main() {
-	bookmark := map[string]string{}
+	bookmark := stringMap{}
+Menu:
 	for {
 		switch dialogue() {
 		case 1:
@@ -13,7 +16,7 @@ func main() {
 		case 3:
 			bookmark = del(bookmark)
 		case 4:
-			return
+			break Menu
 		}
 	}
 }
@@ -31,12 +34,12 @@ func dialogue() int {
 		fmt.Println("Неправильный ввод")
 	}
 }
-func show(bookmark map[string]string) {
+func show(bookmark stringMap) {
 	for key, value := range bookmark {
 		fmt.Printf("Ключ: %s, Значение: %s\n", key, value)
 	}
 }
-func add(bookmark map[string]string) map[string]string {
+func add(bookmark stringMap) stringMap {
 	var newKey string
 	var newValue string
 	fmt.Print("Введите ключ: ")
@@ -46,7 +49,7 @@ func add(bookmark map[string]string) map[string]string {
 	bookmark[newKey] = newValue
 	return bookmark
 }
-func del(bookmark map[string]string) map[string]string {
+func del(bookmark stringMap) stringMap {
 	var newKey string
 	fmt.Print("Введите ключ: ")
 	fmt.Scan(&newKey)
