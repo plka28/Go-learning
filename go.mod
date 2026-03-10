@@ -1,3 +1,3 @@
-module demo/app-2
+module demo/app-4
 
 go 1.25.0

@@ -1,22 +1,32 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
+
+type account struct {
+	login    string
+	password string
+	url      string
+}
 
 func main() {
-	transactions := []float64{}
-	var a float64
-	var sum float64
-	for {
-		fmt.Print("Введиет свою транзакцию: ")
-		fmt.Scan(&a)
-		if a == 0 {
-			break
-		}
-		transactions = append(transactions, a)
+	login := promptData("Введите логин: ")
+	password := promptData("Введите пароль: ")
+	url := promptData("Введите url: ")
+
+	acc1 := account{
+		login:    login,
+		password: password,
+		url:      url,
 	}
-	for _, value := range transactions {
-		sum += value
-	}
-	fmt.Println(transactions)
-	fmt.Println(sum)
+}
+func promptData(prompt string) string {
+	fmt.Print(prompt)
+	var res string
+	fmt.Scan(&res)
+	return res
+}
+func outputPassword(login, password, url string) {
+	fmt.Println(login, password, url)
 }
