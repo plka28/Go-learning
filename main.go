@@ -2,11 +2,13 @@ package main
 
 import (
 	"demo/app-4/account"
+	"demo/app-4/files"
 	"fmt"
 )
 
 func main() {
-
+	files.WriteFile("Привет!", "file.txt")
+	files.ReadFile("file.txt")
 	login := promptData("Введите логин: ")
 	password := promptData("Введите пароль: ")
 	url := promptData("Введите url: ")
