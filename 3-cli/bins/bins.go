@@ -2,7 +2,7 @@ package bins
 
 import "time"
 
-type binList = []Bin
+type BinList = []Bin
 
 type Bin struct {
 	id        string
