@@ -12,32 +12,32 @@ import (
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#*-?")
 
-type account struct {
-	login    string
-	password string
-	url      string
+type Account struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	Url      string `json:"url"`
 }
 
 type accountWithTimeStamp struct {
 	createdAt time.Time
 	updatedAt time.Time
-	account
+	Account
 }
 
-func (myAccount account) OutputPassword() {
-	color.Cyan(myAccount.login)
-	fmt.Println(myAccount.password, myAccount.url)
+func (myAccount Account) OutputPassword() {
+	color.Cyan(myAccount.Login)
+	fmt.Println(myAccount.Password, myAccount.Url)
 }
 
-func (acc *account) generatePassword(n int) {
+func (acc *Account) generatePassword(n int) {
 	password := make([]rune, n)
 	for i := range password {
 		password[i] = letterRunes[rand.IntN(len(letterRunes))]
 	}
-	acc.password = string(password)
+	acc.Password = string(password)
 }
 
-func NewAccount(login, password, urlstring string) (*account, error) {
+func NewAccount(login, password, urlstring string) (*Account, error) {
 	if login == "" {
 		return nil, errors.New("InvalidLogin")
 	}
@@ -46,10 +46,10 @@ func NewAccount(login, password, urlstring string) (*account, error) {
 	if err != nil {
 		return nil, errors.New("InvalidURL")
 	}
-	acc := &account{
-		login:    login,
-		password: password,
-		url:      urlstring,
+	acc := &Account{
+		Login:    login,
+		Password: password,
+		Url:      urlstring,
 	}
 	if password == "" {
 		acc.generatePassword(12)
