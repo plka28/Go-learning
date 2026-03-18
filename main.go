@@ -2,6 +2,8 @@ package main
 
 import (
 	"demo/app-4/account"
+	"demo/app-4/files"
+	"demo/app-4/output"
 	"fmt"
 )
 
@@ -9,44 +11,32 @@ func main() {
 	dialogue()
 }
 
-func createAccount(vault *account.Vault) {
-	login := promptData("Введите логин: ")
-	password := promptData("Введите пароль: ")
-	url := promptData("Введите url: ")
+func createAccount(vault *account.VaultWithDb) {
+	login := promptData([]string{"Введите логин: "})
+	password := promptData([]string{"Введите пароль: "})
+	url := promptData([]string{"Введите url: "})
 
 	myAccount, err := account.NewAccount(login, password, url)
 	if err != nil {
-		fmt.Println("Неверный формат URL/Неверный логин")
+		output.PrintError("Неверный формат URL/Неверный логин")
 		return
 	}
 
-	vault = account.NewVault()
+	vault = account.NewVault(files.NewJsonDb("data.json"))
 	vault.AddAccount(*myAccount)
 }
 
-func promptData(prompt string) string {
-	fmt.Print(prompt)
-	var res string
-	fmt.Scanln(&res)
-	return res
-}
-
 func dialogue() {
-	var choice int
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
 Menu:
 	for {
-		fmt.Println("1. Создать аккаунт")
-		fmt.Println("2. Найти аккаунт")
-		fmt.Println("3. Удалить аккаунт")
-		fmt.Println("4. Выход")
-		fmt.Scanln(&choice)
+		choice := promptData([]string{"1. Создать аккаунт", "2. Найти аккаунт", "3. Удалить аккаунт", "4. Выход", "Выберите вариант"})
 		switch choice {
-		case 1:
+		case "1":
 			createAccount(vault)
-		case 2:
+		case "2":
 			findAccount(vault)
-		case 3:
+		case "3":
 			deleteAccount(vault)
 		default:
 			break Menu
@@ -54,8 +44,8 @@ Menu:
 	}
 }
 
-func findAccount(vault *account.Vault) {
-	choice := promptData("Введите url, который хотите найти: ")
+func findAccount(vault *account.VaultWithDb) {
+	choice := promptData([]string{"Введите url, который хотите найти: "})
 	accs := vault.FindAccountsByURL(choice)
 	if len(accs) == 0 {
 		fmt.Println("Нет аккаунтов с таким url")
@@ -66,8 +56,21 @@ func findAccount(vault *account.Vault) {
 	}
 }
 
-func deleteAccount(vault *account.Vault) {
-	choice := promptData("Введите url, который хотите удалить: ")
+func deleteAccount(vault *account.VaultWithDb) {
+	choice := promptData([]string{"Введите url, который хотите удалить: "})
 	vault.DeleteAccountsByURL(choice)
 	fmt.Println("Аккаунты удалены")
+}
+
+func promptData[T any](prompt []T) string {
+	for index, value := range prompt {
+		if index == len(prompt)-1 {
+			fmt.Printf("%v: ", value)
+		} else {
+			fmt.Println(value)
+		}
+	}
+	var res string
+	fmt.Scanln(&res)
+	return res
 }
