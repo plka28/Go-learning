@@ -1,6 +1,7 @@
 package account
 
 import (
+	"demo/app-4/encrypter"
 	"encoding/json"
 	"strings"
 	"time"
@@ -14,16 +15,17 @@ type Db interface {
 }
 
 type Vault struct {
-	Accounts  []Account `json:"accounts"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	Accounts  []Account `json:"accounts" vault:"accounts"`
+	UpdatedAt time.Time `json:"updatedAt" vault:"accounts"`
 }
 
 type VaultWithDb struct {
 	Vault
-	db Db
+	db  Db
+	enc encrypter.Encrypter
 }
 
-func NewVault(db Db) *VaultWithDb {
+func NewVault(db Db, enc encrypter.Encrypter) *VaultWithDb {
 	file, err := db.Read()
 	if err != nil {
 		return &VaultWithDb{
@@ -31,24 +33,28 @@ func NewVault(db Db) *VaultWithDb {
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
+	data := enc.Decrypt(file)
 	var vault Vault
-	err = json.Unmarshal(file, &vault)
+	err = json.Unmarshal(data, &vault)
 	if err != nil {
-		color.Red("Не удалось разобрать файл data.json")
+		color.Red("Не удалось разобрать файл data.vault")
 		return &VaultWithDb{
 			Vault: Vault{
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
 	return &VaultWithDb{
 		Vault: vault,
 		db:    db,
+		enc:   enc,
 	}
 }
 
@@ -56,10 +62,11 @@ func (vault *VaultWithDb) AddAccount(acc Account) {
 	vault.Accounts = append(vault.Accounts, acc)
 	vault.UpdatedAt = time.Now()
 	data, err := vault.ToBytes()
+	encData := vault.enc.Encrypt(data)
 	if err != nil {
 		color.Red("Не удалось преобразовать")
 	}
-	vault.db.Write(data)
+	vault.db.Write(encData)
 }
 
 func (vault *Vault) ToBytes() ([]byte, error) {
@@ -90,8 +97,9 @@ func (vault *VaultWithDb) DeleteAccountsByURL(url string) {
 	vault.Accounts = accounts
 	vault.UpdatedAt = time.Now()
 	data, err := vault.ToBytes()
+	encData := vault.enc.Encrypt(data)
 	if err != nil {
 		color.Red("Не удалось преобразовать")
 	}
-	vault.db.Write(data)
+	vault.db.Write(encData)
 }

@@ -2,10 +2,13 @@ package main
 
 import (
 	"demo/app-4/account"
+	"demo/app-4/encrypter"
 	"demo/app-4/files"
 	"demo/app-4/output"
 	"fmt"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 var menu = map[string]func(*account.VaultWithDb){
@@ -27,12 +30,16 @@ func createAccount(vault *account.VaultWithDb) {
 		return
 	}
 
-	vault = account.NewVault(files.NewJsonDb("data.json"))
+	vault = account.NewVault(files.NewJsonDb("data.vault"), *encrypter.NewEncrypter())
 	vault.AddAccount(*myAccount)
 }
 
 func dialogue() {
-	vault := account.NewVault(files.NewJsonDb("data.json"))
+	vault := account.NewVault(files.NewJsonDb("data.vault"), *encrypter.NewEncrypter())
+	err := godotenv.Load()
+	if err != nil {
+		output.PrintError("Не удалось найти env файл")
+	}
 Menu:
 	for {
 		choice := promptData("1. Создать аккаунт", "2. Найти аккаунт по url", "3. Найти аккаунт по логину", "4. Удалить аккаунт", "5. Выход", "Выберите вариант")
