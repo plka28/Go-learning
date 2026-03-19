@@ -70,10 +70,10 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func (vault *VaultWithDb) FindAccountsByURL(url string) []Account {
+func (vault *VaultWithDb) FindAccounts(str string, checker func(Account, string) bool) []Account {
 	result := make([]Account, 0)
 	for _, val := range vault.Accounts {
-		if strings.Compare(val.Url, url) == 0 {
+		if checker(val, str) == true {
 			result = append(result, val)
 		}
 	}
